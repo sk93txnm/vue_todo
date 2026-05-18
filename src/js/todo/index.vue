@@ -281,4 +281,3 @@ export default {
   background-color: #ddd;
 }
 </style>
-

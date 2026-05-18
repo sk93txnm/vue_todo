@@ -17,7 +17,6 @@ import Register from 'TodoVuexDir/components/Register/index.vue';
 import List from 'TodoVuexDir/components/List/index.vue';
 import Navi from 'TodoVuexDir/components/Navi/index.vue';
 
-
 export default {
   components: {
     appWrapper: Wrapper,
@@ -28,28 +27,28 @@ export default {
     appNavi: Navi,
   },
   computed: {
-    todoFilter: function () {
+    todoFilter() {
       return this.$store.state.todoFilter;
     },
-    todos: function () {
+    todos() {
       if (this.todoFilter === 'allTodos') {
         return this.$store.state.todos;
       }
       return this.$store.getters[this.todoFilter];
     },
-    errorMessage: function () {
+    errorMessage() {
       return this.$store.state.errorMessage;
     },
   },
   watch: {
-    todos: function (todos) {
+    todos(todos) {
       if (!todos.length) this.$store.dispatch('setEmptyMessage', this.todoFilter);
     },
-    $route: function (to) {
+    $route(to) {
       this.$store.dispatch('setTodoFilter', to.name);
     },
   },
-  created: function () {
+  created() {
     this.$store.dispatch('getTodos');
     this.$store.dispatch('setTodoFilter', this.$route.name);
   },
