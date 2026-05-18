@@ -15,11 +15,11 @@ export default defineConfig({
       targets: ['ie >= 11'],
       additionalLegacyPolyfills: ['regenerator-runtime/runtime'],
     }),
-    // checker({
-    //   eslint: {
-    //     lintCommand: 'eslint "js/**/*.{js,vue}"'
-    //   },
-    // }),
+    checker({
+      eslint: {
+        lintCommand: 'eslint "js/**/*.{js,vue}"'
+      },
+    }),
   ],
   resolve: {
     alias: {

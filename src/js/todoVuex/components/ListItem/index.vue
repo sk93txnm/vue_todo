@@ -29,6 +29,7 @@
           編集
         </button>
         <button
+        @click="$store.dispatch('deleteTodo', todo.id)"
           class="todo__item__btn__delete"
           type="button"
         >
@@ -141,3 +142,4 @@ export default {
   }
 }
 </style>
+

@@ -1,5 +1,6 @@
 <template>
   <app-wrapper>
+    <app-navi />
     <app-register v-if="todoFilter !== 'completedTodos'" />
     <app-error-message />
     <template v-slot:todos>
@@ -14,6 +15,8 @@ import Wrapper from 'TodoVuexDir/components/Wrapper/index.vue';
 import { ErrorMessage, EmptyMessage } from 'TodoVuexDir/components/Message';
 import Register from 'TodoVuexDir/components/Register/index.vue';
 import List from 'TodoVuexDir/components/List/index.vue';
+import Navi from 'TodoVuexDir/components/Navi/index.vue';
+
 
 export default {
   components: {
@@ -22,30 +25,31 @@ export default {
     appEmptyMessage: EmptyMessage,
     appList: List,
     appRegister: Register,
+    appNavi: Navi,
   },
   computed: {
-    todoFilter: function() {
+    todoFilter: function () {
       return this.$store.state.todoFilter;
     },
-    todos: function() {
+    todos: function () {
       if (this.todoFilter === 'allTodos') {
         return this.$store.state.todos;
       }
       return this.$store.getters[this.todoFilter];
     },
-    errorMessage: function() {
+    errorMessage: function () {
       return this.$store.state.errorMessage;
     },
   },
   watch: {
-    todos: function(todos) {
+    todos: function (todos) {
       if (!todos.length) this.$store.dispatch('setEmptyMessage', this.todoFilter);
     },
-    $route: function(to) {
+    $route: function (to) {
       this.$store.dispatch('setTodoFilter', to.name);
     },
   },
-  created: function() {
+  created: function () {
     this.$store.dispatch('getTodos');
     this.$store.dispatch('setTodoFilter', this.$route.name);
   },
