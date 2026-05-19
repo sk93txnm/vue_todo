@@ -61,7 +61,7 @@ export const useTodoStore = defineStore("todos", {
       };
     },
     hideError() {
-      this.errorMessage = "エラーが起きました。";
+      this.errorMessage = "";
     },
 
     showError(payload) {
