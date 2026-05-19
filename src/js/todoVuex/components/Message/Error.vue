@@ -4,14 +4,12 @@
   </div>
 </template>
 
-<script>
-export default {
-  computed: {
-    errorMessage: function() {
-      return this.$store.state.errorMessage;
-    },
-  },
-};
+<script setup>
+import { computed } from 'vue';
+import { useTodoStore } from '../../store/index.js'; 
+
+const todoStore = useTodoStore();
+const errorMessage = computed(() => todoStore.errorMessage);
 </script>
 
 <style lang="scss" scoped>

@@ -1,28 +1,21 @@
 <template>
   <div class="wrapper">
     <div class="inner">
-      <app-header />
+      <Header />
       <main class="main">
         <slot />
         <div class="todos">
           <slot name="todos" />
         </div>
       </main>
-      <app-footer />
+      <Footer />
     </div>
   </div>
 </template>
 
-<script>
+<script setup>
 import Header from 'TodoVuexDir/components/Header/index.vue';
 import Footer from 'TodoVuexDir/components/Footer/index.vue';
-
-export default {
-  components: {
-    appHeader: Header,
-    appFooter: Footer,
-  },
-};
 </script>
 
 <style lang="scss" scoped>
@@ -49,5 +42,4 @@ export default {
   margin-top: 20px;
   padding: 10px;
 }
-
 </style>

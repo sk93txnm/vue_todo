@@ -2,14 +2,12 @@
   <p class="empty">{{ emptyMessage }}</p>
 </template>
 
-<script>
-export default {
-  computed: {
-    emptyMessage: function() {
-      return this.$store.state.emptyMessage;
-    },
-  },
-};
+<script setup>
+import { computed } from 'vue';
+import { useTodoStore } from '../../store/index.js';
+
+const todoStore = useTodoStore();
+const emptyMessage = computed(() => todoStore.emptyMessage);
 </script>
 
 <style lang="scss" scoped>

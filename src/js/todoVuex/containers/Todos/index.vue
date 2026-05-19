@@ -1,53 +1,56 @@
 <template>
-  <app-wrapper>
-    <app-register v-if="todoFilter !== 'completedTodos'" />
-    <app-error-message />
+  <Wrapper>
+    <Navi />
+    <Register v-if="todoFilter !== 'completedTodos'" />
+    <ErrorMessage />
     <template v-slot:todos>
-      <app-list v-if="todos.length" :todos="todos" />
-      <app-empty-message />
+      <List v-if="todos.length" :todos="todos" />
+      <EmptyMessage />
     </template>
-  </app-wrapper>
+  </Wrapper>
 </template>
 
-<script>
+<script setup>
+import { computed, watch, onMounted } from 'vue';
+import { useRoute } from 'vue-router';
+import { useTodoStore } from '../../store/index.js';
+
 import Wrapper from 'TodoVuexDir/components/Wrapper/index.vue';
 import { ErrorMessage, EmptyMessage } from 'TodoVuexDir/components/Message';
 import Register from 'TodoVuexDir/components/Register/index.vue';
 import List from 'TodoVuexDir/components/List/index.vue';
+import Navi from 'TodoVuexDir/components/Navi/index.vue';
 
-export default {
-  components: {
-    appWrapper: Wrapper,
-    appErrorMessage: ErrorMessage,
-    appEmptyMessage: EmptyMessage,
-    appList: List,
-    appRegister: Register,
+const route = useRoute();
+
+const todoStore = useTodoStore();
+const todoFilter = computed(() => todoStore.todoFilter);
+
+const todos = computed(() => {
+  if (todoFilter.value === 'allTodos') {
+    return todoStore.todos;
+  }
+  return todoStore[todoFilter.value] || [];
+});
+
+watch(todos, (newTodos) => {
+  if (!newTodos.length) {
+    todoStore.setEmptyMessage(todoFilter.value);
+  }
+}, { immediate: true });
+
+watch(
+  () => route.name,
+  (newRouteName) => {
+    if (newRouteName) {
+      todoStore.setTodoFilter(newRouteName);
+      todoStore.setEmptyMessage(newRouteName);
+    }
   },
-  computed: {
-    todoFilter: function() {
-      return this.$store.state.todoFilter;
-    },
-    todos: function() {
-      if (this.todoFilter === 'allTodos') {
-        return this.$store.state.todos;
-      }
-      return this.$store.getters[this.todoFilter];
-    },
-    errorMessage: function() {
-      return this.$store.state.errorMessage;
-    },
-  },
-  watch: {
-    todos: function(todos) {
-      if (!todos.length) this.$store.dispatch('setEmptyMessage', this.todoFilter);
-    },
-    $route: function(to) {
-      this.$store.dispatch('setTodoFilter', to.name);
-    },
-  },
-  created: function() {
-    this.$store.dispatch('getTodos');
-    this.$store.dispatch('setTodoFilter', this.$route.name);
-  },
-};
+  { immediate: true }
+);
+
+onMounted(() => {
+  todoStore.getTodos();
+});
 </script>

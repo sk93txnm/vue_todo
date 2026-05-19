@@ -6,20 +6,15 @@
   </footer>
 </template>
 
-<script>
-export default {
-  computed: {
-    todos: function() {
-      return this.$store.state.todos;
-    },
-    incompleteTodosLength: function() {
-      return this.$store.getters.incompleteTodosLength;
-    },
-    completedTodosLength: function() {
-      return this.$store.getters.completedTodosLength;
-    },
-  },
-};
+<script setup>
+import { computed } from 'vue';
+import { useTodoStore } from '../../store/index.js';
+
+const todoStore = useTodoStore();
+const todos = computed(() => todoStore.todos);
+
+const incompleteTodosLength = computed(() => todoStore.incompleteTodosLength);
+const completedTodosLength = computed(() => todoStore.completedTodosLength);
 </script>
 
 <style lang="scss" scoped>

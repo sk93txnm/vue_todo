@@ -6,73 +6,252 @@
       </header>
 
       <main class="main">
-        <form class="register">
+        <form class="register" @submit.prevent="targetTodo.id ? editTodo() : addTodo()">
           <div class="register__input">
             <p class="register__input__title">やることのタイトル</p>
             <input
+              v-model="targetTodo.title"
               type="text"
               name="title"
               placeholder="ここにTODOのタイトルを記入してください"
+              required
             >
           </div>
           <div class="register__input">
             <p class="register__input__title">やることの内容</p>
             <textarea
+              v-model="targetTodo.detail"
               name="detail"
               rows="3"
               placeholder="ここにTODOの内容を記入してください。改行は半角スペースに変換されます。"
+              required
             />
           </div>
           <div class="register__submit">
             <button class="register__submit__btn" type="submit" name="button">
-              登録する
+              <template v-if="targetTodo.id">
+                <span>変更する</span>
+              </template>
+              <template v-else>
+                <span>登録する</span>
+              </template>
             </button>
           </div>
         </form>
+        <div v-if="errorMessage" class="error">
+          <p class="error__text">{{ errorMessage }}</p>
+        </div>
 
         <div class="todos">
-          <ul class="todos__list">
-            <li>
-              <div class="todos__inner">
-                <div class="todos__completed">
-                  <button class="todos__completed__btn" type="button">未完了</button>
+          <template v-if="todos.length">
+            <ul class="todos__list">
+              <li
+                v-for="todo in todos"
+                :key="todo.id"
+                :class="{ 'is-completed': todo.completed }"
+              >
+                <div class="todos__inner">
+                  <div class="todos__completed">
+                    <button
+                      class="todos__completed__btn"
+                      type="button"
+                      @click="changeCompleted(todo)"
+                    >
+                      <template v-if="todo.completed">
+                        <span>完了</span>
+                      </template>
+                      <template v-else>
+                        <span>未完了</span>
+                      </template>
+                    </button>
+                  </div>
+                  <div class="todos__desc">
+                    <h2 class="todos__desc__title">{{ todo.title }}</h2>
+                    <p class="todos__desc__detail">{{ todo.detail }}</p>
+                  </div>
+                  <div class="todos__btn">
+                    <button
+                      class="todos__btn__edit"
+                      type="button"
+                      @click="showEditor(todo)"
+                    >
+                      編集
+                    </button>
+                    <button
+                      class="todos__btn__delete"
+                      type="button"
+                      @click="deleteTodo(todo.id)"
+                    >
+                      削除
+                    </button>
+                  </div>
                 </div>
-                <div class="todos__desc">
-                  <h2 class="todos__desc__title">ここにはTodoのタイトルが入ります</h2>
-                  <p class="todos__desc__detail">ここにはTodoの内容が入ります</p>
-                </div>
-                <div class="todos__btn">
-                  <button class="todos__btn__edit" type="button">編集</button>
-                  <button class="todos__btn__delete" type="button">削除</button>
-                </div>
-              </div>
-            </li>
-          </ul>
+              </li>
+            </ul>
+          </template>
+          <template v-else>
+            <p class="todos__empty">登録されているTODOはありません。</p>
+          </template>
         </div>
       </main>
 
       <footer class="footer">
-        <p>全項目数: 0</p>
-        <p>完了済: 0</p>
-        <p>未完了: 0</p>
+        <p>全項目数: {{ todos.length }}</p>
+        <p>完了済: {{todos.filter(todo => todo.completed).length}}</p>
+        <p>未完了: {{todos.filter(todo => !todo.completed).length}}</p>
       </footer>
     </div>
   </div>
 </template>
 
 <script>
+import axios from 'axios';
+
 export default {
   data() {
     return {
       todos: [
-        // {
-        //   id: 1,
-        //   title: 'タイトル 01',
-        //   detail: '詳細 01',
-        //   completed: false,
-        // },
+        {
+          id: 1,
+          title: 'タイトル 01',
+          detail: '詳細 01',
+          completed: false,
+        },
+        {
+          id: 2,
+          title: 'タイトル 02',
+          detail: '詳細 02',
+          completed: false,
+        },
       ],
+      targetTodo: {
+        id: null,
+        title: '',
+        detail: '',
+        completed: false,
+      },
+      errorMessage: '',
     };
+  },
+  created() {
+    axios.get('http://localhost:3000/api/todos/').then(({ data }) => {
+      this.todos = data.todos.reverse();
+    }).catch(err => {
+      if (err.response.data) {
+        this.errorMessage = err.response.data.message;
+      } else {
+        this.errorMessage = 'ネットに接続がされていない、もしくはサーバーとの接続がされていません。ご確認ください。';
+      }
+    });
+  },
+  methods: {
+    initTargetTodo() {
+      return {
+        id: null,
+        title: '',
+        detail: '',
+        completed: false,
+      };
+    },
+    hideError() {
+      this.errorMessage = '';
+    },
+    showError(err) {
+      if (err.response.data) {
+        this.errorMessage = err.response.data.message;
+      } else {
+        this.errorMessage = 'ネットに接続がされていない、もしくはサーバーとの接続がされていません。ご確認ください。';
+      }
+    },
+    addTodo() {
+      const postTodo = {
+        title: this.targetTodo.title,
+        detail: this.targetTodo.detail,
+      };
+      axios.post('http://localhost:3000/api/todos/', postTodo).then(({ data }) => {
+        this.todos.unshift(data);
+        this.targetTodo = { ...this.targetTodo, title: '', detail: '' };
+        this.hideError();
+      }).catch(err => {
+        this.showError(err);
+      });
+    },
+    changeCompleted(todo) {
+      this.targetTodo = {
+        id: null,
+        title: '',
+        detail: '',
+        completed: false,
+      };
+      const targetTodo = { ...todo };
+      axios.patch(`http://localhost:3000/api/todos/${targetTodo.id}`, {
+        completed: !targetTodo.completed,
+      }).then(({ data }) => {
+        this.todos = this.todos.map(todoItem => {
+          if (todoItem.id === targetTodo.id) return data;
+          return todoItem;
+        });
+        this.errorMessage = '';
+      }).catch(err => {
+        if (err.response.data) {
+          this.errorMessage = err.response.data.message;
+        } else {
+          this.errorMessage = 'ネットに接続がされていない、もしくはサーバーとの接続がされていません。ご確認ください。';
+        }
+      });
+    },
+    showEditor(todo) {
+      this.targetTodo = { ...todo };
+    },
+    editTodo() {
+      const targetTodo = this.todos.find(todo => todo.id === this.targetTodo.id);
+      if (
+        targetTodo.title === this.targetTodo.title
+        && targetTodo.detail === this.targetTodo.detail
+      ) {
+        this.targetTodo = {
+          id: null,
+          title: '',
+          detail: '',
+          completed: false,
+        };
+        return;
+      }
+      axios.patch(`http://localhost:3000/api/todos/${this.targetTodo.id}`, {
+        title: this.targetTodo.title,
+        detail: this.targetTodo.detail,
+      }).then(({ data }) => {
+        this.todos = this.todos.map(todo => {
+          if (todo.id === this.targetTodo.id) return data;
+          return todo;
+        });
+        this.targetTodo = {
+          id: null,
+          title: '',
+          detail: '',
+          completed: false,
+        };
+        this.errorMessage = '';
+      }).catch(err => {
+        if (err.response.data) {
+          this.errorMessage = err.response.data.message;
+        } else {
+          this.errorMessage = 'ネットに接続がされていない、もしくはサーバーとの接続がされていません。ご確認ください。';
+        }
+      });
+    },
+    deleteTodo(id) {
+      axios.delete(`http://localhost:3000/api/todos/${id}`).then(({ data }) => {
+        this.todos = data.todos.reverse();
+        this.errorMessage = '';
+      }).catch(err => {
+        if (err.response.data) {
+          this.errorMessage = err.response.data.message;
+        } else {
+          this.errorMessage = 'ネットに接続がされていない、もしくはサーバーとの接続がされていません。ご確認ください。';
+        }
+      });
+    },
   },
 };
 </script>
@@ -85,6 +264,7 @@ export default {
     width: 700px;
     max-height: 100vh;
   }
+
   &__inner {
     position: relative;
     max-height: calc(100vh - 40px);
@@ -118,27 +298,34 @@ export default {
 .register {
   padding: 10px 20px;
   padding-bottom: 0;
+
   &__inner {
     width: 80%;
   }
+
   &__input {
-    & + & {
+    &+& {
       margin-top: 10px;
     }
+
     &__title {
       font-weight: bold;
       font-size: 14px;
     }
-    input, textarea {
+
+    input,
+    textarea {
       padding: 10px;
       width: 100%;
       font-size: 14px;
       border: 1px solid #ddd;
     }
   }
+
   &__submit {
     margin-top: 10px;
     text-align: right;
+
     &__btn {
       padding: 10px 25px;
       color: #fff;
@@ -152,6 +339,7 @@ export default {
 .error {
   padding: 0 20px;
   text-align: center;
+
   &__text {
     margin-top: 10px;
     padding: 5px;
@@ -164,27 +352,33 @@ export default {
 .todos {
   margin-top: 20px;
   padding: 10px;
+
   &__empty {
     font-size: 14px;
     text-align: center;
   }
+
   &__list {
-    & > li {
+    &>li {
       padding: 15px 10px;
       border-top: 1px solid #ddd;
       transition: all .3s;
+
       &:first-child {
         border-top: none;
       }
+
       &.is-completed {
         color: #ccc;
         background-color: #f3f3f3;
+
         .todos__completed__btn {
           text-decoration: line-through;
           color: #ccc;
           border: 2px solid #eaeaea;
           background-color: #eaeaea;
         }
+
         .todos__desc__title,
         .todos__desc__detail {
           color: #ccc;
@@ -192,14 +386,17 @@ export default {
       }
     }
   }
+
   &__inner {
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
   }
+
   &__completed {
     width: 15%;
     min-width: 100px;
+
     &__btn {
       padding: 5px 10px;
       color: #ff1919;
@@ -211,15 +408,18 @@ export default {
       transition: all .3s;
     }
   }
+
   &__desc {
     width: 70%;
     min-width: 450px;
+
     &__title {
       color: #000;
       font-weight: bold;
       font-size: 16px;
       line-height: 1.2;
       transition: all .3s;
+
       input {
         padding: 5px 10px;
         width: 100%;
@@ -229,12 +429,14 @@ export default {
         transition: all .3s;
       }
     }
+
     &__detail {
       margin-top: 5px;
       color: #777;
       font-size: 14px;
       line-height: 1.2;
       transition: all .3s;
+
       textarea {
         padding: 5px 10px;
         width: 100%;
@@ -245,10 +447,12 @@ export default {
       }
     }
   }
+
   &__btn {
     width: 10%;
     min-width: 70px;
     text-align: center;
+
     &__edit,
     &__delete {
       padding: 5px 10px;
@@ -256,9 +460,11 @@ export default {
       color: #fff;
       font-size: 12px;
     }
+
     &__edit {
       background-color: #07C4D7;
     }
+
     &__delete {
       margin-top: 5px;
       background-color: #ff1919;

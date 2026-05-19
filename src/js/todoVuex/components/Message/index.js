@@ -1,7 +1,2 @@
-import EmptyMessage from './Empty.vue';
-import ErrorMessage from './Error.vue';
-
-export {
-  EmptyMessage,
-  ErrorMessage,
-};
+export { default as EmptyMessage } from './Empty.vue';
+export { default as ErrorMessage } from './Error.vue';
