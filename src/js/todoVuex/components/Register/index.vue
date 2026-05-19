@@ -6,25 +6,26 @@
         type="text"
         name="title"
         placeholder="ここにTODOのタイトルを記入してください"
-        v-model="title"
+        v-model="todoStore.targetTodo.title"
       >
-
     </div>
+    
     <div class="register__input">
       <p class="register__input__title">やることの内容</p>
       <textarea
         name="detail"
         :rows="rows"
         placeholder="ここにTODOの内容を記入してください。"
-        v-model="detail"
+        v-model="todoStore.targetTodo.detail"
       />
     </div>
+    
     <div class="register__submit">
       <button
         class="register__submit__btn"
         type="button"
         name="addButton"
-        @click="(targetTodo.id === null) ? addTodo() : editTodo()"
+        @click="(targetTodo.id === null) ? todoStore.addTodo() : todoStore.editTodo()"
       >
         <template v-if="targetTodo.id === null">
           <span>登録する</span>
@@ -37,50 +38,16 @@
   </form>
 </template>
 
-<script>
-export default {
-  computed: {
-    targetTodo() {
-      return this.$store.state.targetTodo;
-    },
-    title: {
-      get() {
-        return this.$store.state.targetTodo.title;
-      },
-      set(value) {
-        this.$store.dispatch({
-          type: 'updateTargetTodo',
-          name: 'title',
-          value,
-        });
-      },
-    },
-    detail: {
-      get() {
-        return this.$store.state.targetTodo.detail;
-      },
-      set(value) {
-        this.$store.dispatch({
-          type: 'updateTargetTodo',
-          name: 'detail',
-          value,
-        });
-      },
-    },
-    rows() {
-      const num = this.targetTodo.detail.split('\n').length;
-      return (num > 3) ? num : 3;
-    },
-  },
-  methods: {
-    addTodo() {
-      this.$store.dispatch('addTodo');
-    },
-    editTodo() {
-      this.$store.dispatch('editTodo');
-    },
-  },
-};
+<script setup>
+import { computed } from 'vue';
+import { useTodoStore } from '../../store/index.js';
+
+const todoStore = useTodoStore();
+const targetTodo = computed(() => todoStore.targetTodo);
+const rows = computed(() => {
+  const num = todoStore.targetTodo.detail?.split('\n').length || 1;
+  return num > 3 ? num : 3;
+});
 </script>
 
 <style lang="scss" scoped>

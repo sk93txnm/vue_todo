@@ -5,7 +5,7 @@
         <button
           class="todo__item__completed__btn"
           type="button"
-          @click="changeCompleted(todo)"
+          @click="todoStore.changeCompleted(todo)"
         >
           <template v-if="todo.completed">
             <span>完了</span>
@@ -15,6 +15,7 @@
           </template>
         </button>
       </div>
+      
       <div class="todo__item__desc">
         <h2 class="todo__item__desc__title">{{ todo.title }}</h2>
         <p class="todo__item__desc__detail">{{ todo.detail }}</p>
@@ -24,14 +25,14 @@
         <button
           class="todo__item__btn__edit"
           type="button"
-          @click="showEditor(todo)"
+          @click="todoStore.showEditor(todo)"
         >
           編集
         </button>
         <button
-        @click="$store.dispatch('deleteTodo', todo.id)"
           class="todo__item__btn__delete"
           type="button"
+          @click="todoStore.deleteTodo(todo.id)"
         >
           削除
         </button>
@@ -40,25 +41,18 @@
   </li>
 </template>
 
-<script>
-export default {
-  props: {
-    todo: {
-      type: Object,
-      default() {
-        return {};
-      },
-    },
+<script setup>
+import { useTodoStore } from '../../store/index.js';
+
+const todoStore = useTodoStore();
+
+defineProps({
+  todo: {
+    type: Object,
+    default: () => ({}), 
   },
-  methods: {
-    changeCompleted(todo) {
-      this.$store.dispatch('changeCompleted', todo);
-    },
-    showEditor(todo) {
-      this.$store.dispatch('showEditor', todo);
-    },
-  },
-};
+});
+
 </script>
 
 <style lang="scss" scoped>

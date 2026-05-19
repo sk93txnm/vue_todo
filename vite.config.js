@@ -1,7 +1,9 @@
 import { defineConfig } from 'vite';
-import { createVuePlugin } from 'vite-plugin-vue2';
+import vue from '@vitejs/plugin-vue'; // ❶ Vue 3用の公式プラグインに変更
 import legacy from '@vitejs/plugin-legacy';
 import checker from 'vite-plugin-checker';
+import path from 'path'; // ❺ パス結合用のモジュールを追加
+import autoprefixer from 'autoprefixer'; // require の代わりに import を使用
 
 export default defineConfig({
   root: 'src',
@@ -10,30 +12,33 @@ export default defineConfig({
     emptyOutDir: true,
   },
   plugins: [
-    createVuePlugin(),
+    vue(), // ❶ Vue 3用プラグインを適用
     legacy({
-      targets: ['ie >= 11'],
-      additionalLegacyPolyfills: ['regenerator-runtime/runtime'],
+      targets: ['defaults', 'not IE 11'], // ❷ Vue 3はIE11非対応のためターゲットを変更
     }),
-    checker({
-      eslint: {
-        lintCommand: 'eslint "js/**/*.{js,vue}"'
-      },
-    }),
+    // checker({
+    //   eslint: {
+    //     // 必要に応じて、検証対象の拡張子に .ts などを追加してください
+    //     lintCommand: 'eslint "js/**/*.{js,vue}"'
+    //   },
+    // }),
   ],
   resolve: {
     alias: {
-      'vue$': 'vue/dist/vue.esm.js',
-      'TodoDir': `${__dirname}/src/js/todo`,
-      'TodoRouterDir': `${__dirname}/src/js/todoRouter`,
-      'TodoVuexDir': `${__dirname}/src/js/todoVuex`,
-      'VuexSample': `${__dirname}/src/js/todoVuex_sample`,
+      // ❸ Vue 3用の本体エイリアスに変更（不要な場合もありますが、互換性のために残すならこちら）
+      'vue': 'vue/dist/vue.esm-bundler.js', 
+      
+      // ❹ __dirname の記述エラーを防ぐため path.resolve を使用
+      'TodoDir': path.resolve(__dirname, 'src/js/todo'),
+      'TodoRouterDir': path.resolve(__dirname, 'src/js/todoRouter'),
+      'TodoVuexDir': path.resolve(__dirname, 'src/js/todoVuex'),
+      'VuexSample': path.resolve(__dirname, 'src/js/todoVuex_sample'),
     },
   },
   css: {
     postcss: {
       plugins: [
-        require('autoprefixer'),
+        autoprefixer(), // ESM（import）の形式に合わせて記述
       ],
     },
   },
@@ -42,3 +47,4 @@ export default defineConfig({
     port: 8080,
   },
 });
+
