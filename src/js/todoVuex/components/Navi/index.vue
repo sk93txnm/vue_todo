@@ -6,14 +6,10 @@
   </div>
 </template>
 
-<script setup>
-/* 💡 空の export default {} は不要なので削除しました。
-   setup と書くだけで、このコンポーネントの準備は完了です。 */
+<script setup lang="ts">
 </script>
 
 <style lang="scss" scoped>
-/* 💡 クラス名（シングルクォーテーションを標準的なダブルクォーテーションに統一しました）
-   スタイル定義はそのまま完全に流用可能です */
 .todo__link {
   display: flex;
 

@@ -13,7 +13,7 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import Header from 'TodoVuexDir/components/Header/index.vue';
 import Footer from 'TodoVuexDir/components/Footer/index.vue';
 </script>

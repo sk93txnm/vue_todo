@@ -41,17 +41,16 @@
   </li>
 </template>
 
-<script setup>
-import { useTodoStore } from '../../store/index.js';
+<script setup lang="ts">
+import { useTodoStore } from '../../store/index.ts';
+import type { Todo } from '../../store/index.ts';
 
 const todoStore = useTodoStore();
 
-defineProps({
-  todo: {
-    type: Object,
-    default: () => ({}), 
-  },
-});
+interface Props {
+  todo: Todo;
+}
+defineProps<Props>();
 
 </script>
 
