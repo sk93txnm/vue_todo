@@ -6,9 +6,9 @@
   </footer>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { computed } from 'vue';
-import { useTodoStore } from '../../store/index.js';
+import { useTodoStore } from '../../store/index';
 
 const todoStore = useTodoStore();
 const todos = computed(() => todoStore.todos);

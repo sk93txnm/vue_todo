@@ -4,9 +4,9 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { computed } from 'vue';
-import { useTodoStore } from '../../store/index.js'; 
+import { useTodoStore } from '../../store/index.ts'; 
 
 const todoStore = useTodoStore();
 const errorMessage = computed(() => todoStore.errorMessage);

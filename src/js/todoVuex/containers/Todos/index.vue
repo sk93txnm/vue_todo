@@ -10,10 +10,10 @@
   </Wrapper>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { computed, watch, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
-import { useTodoStore } from '../../store/index.js';
+import { useTodoStore } from '../../store/index.ts';
 
 import Wrapper from 'TodoVuexDir/components/Wrapper/index.vue';
 import { ErrorMessage, EmptyMessage } from 'TodoVuexDir/components/Message';
@@ -27,10 +27,13 @@ const todoStore = useTodoStore();
 const todoFilter = computed(() => todoStore.todoFilter);
 
 const todos = computed(() => {
-  if (todoFilter.value === 'allTodos') {
-    return todoStore.todos;
+  if (todoFilter.value === 'completedTodos') {
+    return todoStore.completedTodos;
   }
-  return todoStore[todoFilter.value] || [];
+  if (todoFilter.value === 'incompleteTodos') {
+    return todoStore.incompleteTodos;
+  }
+  return todoStore.todos;
 });
 
 watch(todos, (newTodos) => {
@@ -42,7 +45,7 @@ watch(todos, (newTodos) => {
 watch(
   () => route.name,
   (newRouteName) => {
-    if (newRouteName) {
+    if (typeof newRouteName === 'string') {
       todoStore.setTodoFilter(newRouteName);
       todoStore.setEmptyMessage(newRouteName);
     }
