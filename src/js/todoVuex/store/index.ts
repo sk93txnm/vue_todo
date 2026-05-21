@@ -106,7 +106,7 @@ export const useTodoStore = defineStore("todos", {
         const { data } = await axios.get<{ todos: Todo[] }>("http://localhost:3000/api/todos/");
         this.todos = data.todos.reverse();
         this.setEmptyMessage(this.todoFilter);
-      } catch (err: any) {
+      } catch (err: unknown) {
         this.showError(err.response);
       }
     },
@@ -125,7 +125,7 @@ export const useTodoStore = defineStore("todos", {
       try {
         const { data } = await axios.post<Todo>("http://localhost:3000/api/todos/", postTodo);
         this.todos.unshift(data);
-      } catch (err: any) {
+      } catch (err: unknown) {
         this.showError(err.response);
       } finally {
         this.initTargetTodo();
@@ -140,7 +140,7 @@ export const useTodoStore = defineStore("todos", {
         });
 
         this.todos = this.todos.map((todoItem) => (todoItem.id === data.id ? data : todoItem));
-      } catch (err: any) {
+      } catch (err: unknown) {
         this.showError(err.response);
       } finally {
         this.initTargetTodo();
@@ -165,7 +165,7 @@ export const useTodoStore = defineStore("todos", {
           detail: this.targetTodo.detail,
         });
         this.todos = this.todos.map((todoItem) => (todoItem.id === data.id ? data : todoItem));
-      } catch (err: any) {
+      } catch (err: unknown) {
         this.showError(err.response);
       } finally {
         this.initTargetTodo();
@@ -176,7 +176,7 @@ export const useTodoStore = defineStore("todos", {
       try {
         await axios.delete(`http://localhost:3000/api/todos/${todoId}`);
         this.todos = this.todos.filter((todoItem) => todoItem.id !== todoId);
-      } catch (err: any) {
+      } catch (err: unknown) {
         this.showError(err.response);
       }
     },
